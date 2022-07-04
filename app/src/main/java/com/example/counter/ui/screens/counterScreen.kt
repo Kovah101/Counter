@@ -44,7 +44,6 @@ fun CounterScreen(viewModel: CounterViewModel) {
             IncrementOrDecrement(viewModel)
             Spacer(modifier = Modifier.height(20.dp))
             CounterLabel()
-            //FloatingResetButton(viewModel = viewModel)
 
         }
     }

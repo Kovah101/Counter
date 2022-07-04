@@ -14,7 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.counter.data.viewmodel.CounterViewModel
 import com.example.counter.ui.screens.CounterScreen
 import com.example.counter.ui.theme.CounterTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
