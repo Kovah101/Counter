@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Counter</string>
+    <string name="counterLabel">Count</string>
+    <string name="counterTitle">Counter</string>
+</resources>
