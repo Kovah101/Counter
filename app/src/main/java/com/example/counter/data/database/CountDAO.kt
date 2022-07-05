@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Dao
 interface CountDAO {
-    @Query("SELECT count FROM count_table WHERE countId = :countID")
-    suspend fun getCount(countID : Int) : StateFlow<Int>
+    //@Query("SELECT count FROM count_table WHERE countId = :countID")
+    //fun getCount(countID : Int) : StateFlow<Int>
 
     //@Query("UPDATE count_table SET count = :newCount WHERE countId = 0 ")
     //suspend fun updateCount(newCount: Int)
@@ -15,7 +15,7 @@ interface CountDAO {
     suspend fun updateCount(count: Count)
 
     @Insert
-    suspend fun startNewCount(count : Int)
+    suspend fun startNewCount(count : Count)
 
     //@Query("DELETE FROM count_table")
     //suspend fun clear()

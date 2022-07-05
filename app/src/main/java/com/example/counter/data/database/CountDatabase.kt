@@ -9,24 +9,24 @@ import androidx.room.RoomDatabase
 abstract class CountDatabase : RoomDatabase() {
     abstract fun countDao(): CountDAO
 
-    companion object {
-        @Volatile
-        private var INSTANCE: CountDatabase? = null
-
-        fun getInstance(context: Context): CountDatabase {
-            synchronized(this) {
-                var instance = INSTANCE
-                if (instance == null) {
-                    instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        CountDatabase::class.java,
-                        "count_database"
-                    ).fallbackToDestructiveMigration()
-                        .build()
-                    INSTANCE = instance
-                }
-                return instance
-            }
-        }
-    }
+//    companion object {
+//        @Volatile
+//        private var INSTANCE: CountDatabase? = null
+//
+//        fun getInstance(context: Context): CountDatabase {
+//            synchronized(this) {
+//                var instance = INSTANCE
+//                if (instance == null) {
+//                    instance = Room.databaseBuilder(
+//                        context.applicationContext,
+//                        CountDatabase::class.java,
+//                        "count_database"
+//                    ).fallbackToDestructiveMigration()
+//                        .build()
+//                    INSTANCE = instance
+//                }
+//                return instance
+//            }
+//        }
+//    }
 }
