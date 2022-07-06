@@ -22,6 +22,7 @@ class CountModule {
             appContext.applicationContext,
             CountDatabase::class.java,
             "count_database"
-        ).build()
+        ).fallbackToDestructiveMigration()
+            .build()
     }
 }

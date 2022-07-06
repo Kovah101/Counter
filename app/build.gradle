@@ -67,7 +67,7 @@ dependencies {
     annotationProcessor("androidx.room:room-compiler:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
-    //implementation 'androidx.compose.compiler:compiler:1.2.0'
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
 }
 
 kapt {

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -19,12 +20,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.counter.R
+import com.example.counter.data.database.Count
 import com.example.counter.data.viewmodel.CounterViewModel
-
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 @Composable
 fun CounterScreen(viewModel: CounterViewModel) {
+    val state = viewModel.state.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -33,14 +37,15 @@ fun CounterScreen(viewModel: CounterViewModel) {
             )
         },
         floatingActionButton = { FloatingResetButton(viewModel) }
-    ) {
+    ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            val count = viewModel.count.collectAsState()
-            CounterNumber(count)
+            CounterNumber(state.value.count)
             IncrementOrDecrement(viewModel)
             Spacer(modifier = Modifier.height(20.dp))
             CounterLabel()
@@ -51,13 +56,13 @@ fun CounterScreen(viewModel: CounterViewModel) {
 }
 
 @Composable
-fun CounterNumber(count : State<Int>) {
+fun CounterNumber(count : Int) {
     Text(
-        text = count.value.toString(),
+        text = count.toString(),
         fontStyle = FontStyle.Italic,
         color = colorResource(id = R.color.teal_700),
         fontSize = 150.sp,
-        fontWeight = FontWeight.Bold
+        fontWeight = FontWeight.Bold,
     )
 }
 

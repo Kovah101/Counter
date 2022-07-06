@@ -10,6 +10,6 @@ data class Count(
     @PrimaryKey(autoGenerate = true)
     var countId: Int = 0,
 
-    @ColumnInfo(name = "count")
+    @ColumnInfo(name = "count", defaultValue = "0")
     var count: Int = 0
 )
