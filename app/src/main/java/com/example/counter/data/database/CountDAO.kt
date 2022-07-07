@@ -1,6 +1,7 @@
 package com.example.counter.data.database
 
 import androidx.room.*
+import androidx.room.OnConflictStrategy.REPLACE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,7 +12,7 @@ interface CountDAO {
     @Query("SELECT * FROM count_table")
     fun getCount() : Flow<Count>
 
-    @Update
+    @Insert(onConflict = REPLACE)
     suspend fun updateCount(count: Count)
 
 //    @Insert

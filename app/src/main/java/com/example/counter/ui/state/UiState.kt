@@ -6,7 +6,7 @@ data class UiState(
     val counter: Count
 ) {
     companion object{
-        val Default = UiState(Count(0,0))
+        val Default = UiState(Count(1,0))
     }
 
 }
