@@ -21,9 +21,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewModel by viewModels<CounterViewModel>()
         setContent {
-            CounterScreen(viewModel)
+            CounterScreen()
         }
     }
 }

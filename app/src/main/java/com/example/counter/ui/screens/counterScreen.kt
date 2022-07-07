@@ -1,15 +1,13 @@
 package com.example.counter.ui.screens
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -20,14 +18,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.counter.R
-import com.example.counter.data.database.Count
 import com.example.counter.data.viewmodel.CounterViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.hilt.navigation.compose.hiltViewModel
+
 
 
 @Composable
-fun CounterScreen(viewModel: CounterViewModel) {
-    val state = viewModel.state.collectAsState()
+fun CounterScreen() {
+    val viewModel = hiltViewModel<CounterViewModel>()
+    val state by viewModel.state.collectAsState()
 
     Scaffold(
         topBar = {
@@ -45,7 +44,7 @@ fun CounterScreen(viewModel: CounterViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CounterNumber(state.value.count)
+            CounterNumber(state.counter.count)
             IncrementOrDecrement(viewModel)
             Spacer(modifier = Modifier.height(20.dp))
             CounterLabel()
@@ -80,7 +79,10 @@ fun IncrementOrDecrement(viewModel: CounterViewModel) {
 
 @Composable
 fun IncreaseCount(viewModel: CounterViewModel) {
-    Button(onClick = { viewModel.incrementCount() },
+    Button(onClick = {
+        Log.d("Counter", "Increase button clicked count=${viewModel.state.value.counter.count}")
+        viewModel.incrementCount()
+        Log.d("Counter", "Increase button clicked count=${viewModel.state.value.counter.count}")},
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.teal_200)),
     ) {
