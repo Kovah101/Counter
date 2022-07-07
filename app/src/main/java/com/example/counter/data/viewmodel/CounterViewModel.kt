@@ -1,8 +1,10 @@
 package com.example.counter.data.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.counter.data.database.Count
 import com.example.counter.data.repository.CountRepository
 import com.example.counter.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +19,13 @@ class CounterViewModel @Inject constructor(
     private val countRepository: CountRepository
 ) : ViewModel() {
 
+    private val counter = countRepository.getCount().map { counter ->
+        UiState(counter)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), UiState.Default)
+
     private val _state = MutableStateFlow(UiState.Default)
     val state : StateFlow<UiState> = _state
+
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -37,6 +44,8 @@ class CounterViewModel @Inject constructor(
             countRepository.updateCount(newCount)
             Log.d("Counter", "Add state=${state.value.counter.count}")
             Log.d("Counter", "Add _state=${_state.value.counter.count}")
+            Log.d("Counter", "Add counter=${counter.value.counter.count}")
+            //_state.value = UiState(newCount)
         }
     }
 
@@ -47,6 +56,8 @@ class CounterViewModel @Inject constructor(
             countRepository.updateCount(newCount)
             Log.d("Counter", "Minus state=${state.value.counter.count}")
             Log.d("Counter", "Minus _state=${_state.value.counter.count}")
+            Log.d("Counter", "Minus counter=${counter.value.counter.count}")
+           // _state.value = UiState(newCount)
         }
     }
 
@@ -57,6 +68,8 @@ class CounterViewModel @Inject constructor(
             countRepository.updateCount(newCount)
             Log.d("Counter", "Reset state=${state.value.counter.count}")
             Log.d("Counter", "Reset _state=${_state.value.counter.count}")
+            Log.d("Counter", "Reset counter=${counter.value.counter.count}")
+            //_state.value = UiState(newCount)
         }
     }
 
