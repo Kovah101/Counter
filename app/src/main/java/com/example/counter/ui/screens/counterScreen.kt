@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.sp
 import com.example.counter.R
 import com.example.counter.data.viewmodel.CounterViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.counter.data.database.Count
+import com.example.counter.ui.event.CounterEvent
 import com.example.counter.ui.state.UiState
 
 
@@ -32,20 +34,23 @@ fun CounterScreen() {
 
     CounterScreenContent(
         state = state,
-        incrementCount = viewModel::incrementCount,
-        decrementCount = viewModel::decrementCount,
-        resetCount = viewModel::resetCount
+        eventHandler = viewModel::postEvent
+//        incrementCount = viewModel::incrementCount,
+//        decrementCount = viewModel::decrementCount,
+//        resetCount = viewModel::resetCount
     )
 }
 
 @Composable
 fun CounterScreenContent(
     state: UiState,
-    incrementCount: () -> Unit,
-    decrementCount: () -> Unit,
-    resetCount: () -> Unit
+    eventHandler: (CounterEvent) -> Unit
+//    incrementCount: () -> Unit,
+//    decrementCount: () -> Unit,
+//    resetCount: () -> Unit
 ) {
     Log.d("Counter State", "$state")
+    val counter = state.counter
     Scaffold(
         topBar = {
             TopAppBar(
@@ -53,7 +58,7 @@ fun CounterScreenContent(
                 backgroundColor = colorResource(id = R.color.teal_200)
             )
         },
-        floatingActionButton = { FloatingResetButton(resetCount) }
+        floatingActionButton = { FloatingResetButton { eventHandler(CounterEvent.ResetCount(counter)) } }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -62,8 +67,8 @@ fun CounterScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CounterNumber(state.counter.count)
-            IncrementOrDecrement(incrementCount = incrementCount, decrementCount = decrementCount)
+            CounterNumber(counter.count)
+            IncrementOrDecrement(eventHandler, counter)
             Spacer(modifier = Modifier.height(20.dp))
             CounterLabel()
 
@@ -85,21 +90,29 @@ fun CounterNumber(count: Int) {
 }
 
 @Composable
-fun IncrementOrDecrement(incrementCount: () -> Unit, decrementCount: () -> Unit) {
+fun IncrementOrDecrement(
+    eventHandler: (CounterEvent) -> Unit,
+    counter : Count
+    //incrementCount: () -> Unit, decrementCount: () -> Unit
+) {
     Row(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IncreaseCount(incrementCount)
+        IncreaseCount(eventHandler, counter)
         Spacer(modifier = Modifier.width(20.dp))
-        DecreaseCount(decrementCount)
+        DecreaseCount(eventHandler, counter)
     }
 }
 
 @Composable
-fun IncreaseCount(incrementCount: () -> Unit) {
+fun IncreaseCount(
+    eventHandler: (CounterEvent) -> Unit,
+    counter: Count
+    //incrementCount: () -> Unit
+) {
     Button(
-        onClick = incrementCount,
+        onClick = { eventHandler(CounterEvent.IncrementCount(counter)) },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.teal_200)
         ),
@@ -109,9 +122,13 @@ fun IncreaseCount(incrementCount: () -> Unit) {
 }
 
 @Composable
-fun DecreaseCount(decrementCount: () -> Unit) {
+fun DecreaseCount(
+    eventHandler: (CounterEvent) -> Unit,
+    counter: Count
+    //decrementCount: () -> Unit
+) {
     Button(
-        onClick = decrementCount,
+        onClick = {eventHandler(CounterEvent.DecrementCount(counter))},
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.teal_200)
         ),
