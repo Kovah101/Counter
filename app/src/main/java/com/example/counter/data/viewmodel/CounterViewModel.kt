@@ -9,6 +9,7 @@ import com.example.counter.data.repository.CountRepository
 import com.example.counter.data.result.Result
 import com.example.counter.data.result.asResult
 import com.example.counter.ui.event.CounterEvent
+import com.example.counter.ui.state.AltUiState
 import com.example.counter.ui.state.CounterState
 import com.example.counter.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,20 +25,28 @@ class CounterViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Observe counter information
-//    private val counter : Flow<Result<Count>> = countRepository.getCount().asResult()
-//
-//    val uiState: StateFlow<UiState> = combine(counter, counter) {counterOneResult, counterTwoResult ->
-//        val counter: CounterState =
-//            if (counterOneResult is Result.Success) {
-//                val count = counterOneResult.data
-//                CounterState.Success(count)
-//            } else if (counterOneResult is Result.Loading){
-//                CounterState.Loading
-//            } else {
-//                CounterState.Error
-//            }
-//        UiState(counter)
-//    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UiState(CounterState.Success.Default))
+    private val counter : Flow<Result<Count>> = countRepository.getCount().asResult()
+
+    // TODO refactor uiState to use single input flow + loading, success & Error state
+//    val uiState: StateFlow<AltUiState> =
+//        counter.collect {
+//        }
+//        }(counter, counter) { counterOneResult, _ ->
+//            val counter: CounterState =
+//                if (counterOneResult is Result.Success) {
+//                    val count = counterOneResult.data.count
+//                    CounterState.Success(count)
+//                } else if (counterOneResult is Result.Loading) {
+//                    CounterState.Loading
+//                } else {
+//                    CounterState.Error
+//                }
+//            AltUiState(counter)
+//        }.stateIn(
+//            viewModelScope,
+//            SharingStarted.WhileSubscribed(5000),
+//            AltUiState(CounterState.Success.Default)
+//        )
 
     private val _events: MutableSharedFlow<CounterEvent> = MutableSharedFlow()
     private val event = _events.asSharedFlow()
@@ -77,12 +86,12 @@ class CounterViewModel @Inject constructor(
         when (event) {
             is CounterEvent.IncrementCount -> {
                 val newCount = state.value.counter.copy(count = state.value.counter.count + 1)
-                Log.d("Counter", "New count: ${newCount.count}")
                 viewModelScope.launch(Dispatchers.IO) {
                     countRepository.updateCount(newCount)
-                    Log.d("Counter", "Add state=${state.value.counter.count}")
+                    Log.d("Counter", "Minus state=${state.value.counter.count}")
                 }
-            }
+                }
+
             is CounterEvent.DecrementCount -> {
                 val newCount = state.value.counter.copy(count = state.value.counter.count - 1)
                 viewModelScope.launch(Dispatchers.IO) {
@@ -99,7 +108,6 @@ class CounterViewModel @Inject constructor(
             }
         }
     }
-
 
 
 //    fun incrementCount() {
