@@ -68,7 +68,7 @@ class CounterViewModel @Inject constructor(
                     } else {
                         AltUiState.Loading
                     }
-                // Which way is better?
+                //TODO Which way is better?
                 _uiState.update { altUiState ->
                     altUiState.copy(count = counterUI.count, loading = counterUI.loading, error = counterUI.error)
                 }
@@ -83,7 +83,7 @@ class CounterViewModel @Inject constructor(
         }
     }
 
-    // Best way to update count? use event value passed??
+    // TODO Best way to update count? use event value passed??
     fun handleEvent(event: CounterEvent) {
         when (event) {
             is CounterEvent.IncrementCount -> {
