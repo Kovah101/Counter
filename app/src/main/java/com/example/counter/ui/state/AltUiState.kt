@@ -14,14 +14,3 @@ data class AltUiState(
         val Error = AltUiState(0,false,"ERROR")
     }
 }
-
-sealed interface CounterState {
-    data class Success(val count: Count) : CounterState {
-        companion object {
-            val Default = Success(Count(1, 0))
-        }
-    }
-
-    object Error : CounterState
-    object Loading : CounterState
-}

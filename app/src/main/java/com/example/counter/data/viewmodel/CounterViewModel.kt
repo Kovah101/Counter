@@ -1,16 +1,13 @@
 package com.example.counter.data.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.counter.data.database.Count
 import com.example.counter.data.repository.CountRepository
 import com.example.counter.data.result.Result
 import com.example.counter.data.result.asResult
 import com.example.counter.ui.event.CounterEvent
 import com.example.counter.ui.state.AltUiState
-import com.example.counter.ui.state.CounterState
 import com.example.counter.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -28,9 +25,9 @@ class CounterViewModel @Inject constructor(
     private val event = _events.asSharedFlow()
 
     // V2 - Using Result
-    private val counter : Flow<Result<Int>> = countRepository.getCount().asResult()
+    private val counter: Flow<Result<Int>> = countRepository.getCount().asResult()
 
-    private val _uiState =  MutableStateFlow(AltUiState.Loading)
+    private val _uiState = MutableStateFlow(AltUiState.Loading)
     val uiState: StateFlow<AltUiState> = _uiState
 
     // V1 - Not using Result
@@ -57,22 +54,27 @@ class CounterViewModel @Inject constructor(
                 handleEvent(event)
             }
         } // V2 with checking result
-        viewModelScope.launch{
+        viewModelScope.launch {
             counter.collect { counterResult ->
                 val counterUI =
-                    if (counterResult is Result.Success){
-                        AltUiState(count = counterResult.data, loading = false, error = "")
-
-                    } else if (counterResult is Result.Loading){
-                        AltUiState.Loading
-                    } else {
-                        AltUiState.Loading
+                    when (counterResult) {
+                        is Result.Success -> AltUiState(
+                            count = counterResult.data,
+                            loading = false,
+                            error = ""
+                        )
+                        is Result.Loading -> AltUiState.Loading
+                        is Result.Error -> AltUiState.Error
                     }
                 //TODO Which way is better?
                 _uiState.update { altUiState ->
-                    altUiState.copy(count = counterUI.count, loading = counterUI.loading, error = counterUI.error)
+                    altUiState.copy(
+                        count = counterUI.count,
+                        loading = counterUI.loading,
+                        error = counterUI.error
+                    )
                 }
-                    //_uiState.value = counterUI
+                //_uiState.value = counterUI
             }
         }
     }
@@ -93,7 +95,7 @@ class CounterViewModel @Inject constructor(
                     countRepository.updateCount(eventCount)
                     Log.d("Counter", "Minus state=${state.value.count}")
                 }
-                }
+            }
 
             is CounterEvent.DecrementCount -> {
                 val newCount = state.value.count - 1
