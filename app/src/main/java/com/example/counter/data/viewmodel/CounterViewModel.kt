@@ -24,33 +24,16 @@ class CounterViewModel @Inject constructor(
     private val countRepository: CountRepository
 ) : ViewModel() {
 
-    // Observe counter information
-    private val counter : Flow<Result<Count>> = countRepository.getCount().asResult()
-
-    // TODO refactor uiState to use single input flow + loading, success & Error state
-//    val uiState: StateFlow<AltUiState> =
-//        counter.collect {
-//        }
-//        }(counter, counter) { counterOneResult, _ ->
-//            val counter: CounterState =
-//                if (counterOneResult is Result.Success) {
-//                    val count = counterOneResult.data.count
-//                    CounterState.Success(count)
-//                } else if (counterOneResult is Result.Loading) {
-//                    CounterState.Loading
-//                } else {
-//                    CounterState.Error
-//                }
-//            AltUiState(counter)
-//        }.stateIn(
-//            viewModelScope,
-//            SharingStarted.WhileSubscribed(5000),
-//            AltUiState(CounterState.Success.Default)
-//        )
-
     private val _events: MutableSharedFlow<CounterEvent> = MutableSharedFlow()
     private val event = _events.asSharedFlow()
 
+    // V2 - Using Result
+    private val counter : Flow<Result<Int>> = countRepository.getCount().asResult()
+
+    private val _uiState =  MutableStateFlow(AltUiState.Loading)
+    val uiState: StateFlow<AltUiState> = _uiState
+
+    // V1 - Not using Result
     private val _state = MutableStateFlow(UiState.Default)
     val state: StateFlow<UiState> = _state
 
@@ -58,19 +41,38 @@ class CounterViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     init {
+        // V1 without checking result
         viewModelScope.launch {
             countFlow.collect { count ->
                 Log.d("Collected", "$count")
                 count?.let {
                     _state.update { uiState ->
-                        uiState.copy(counter = count)
+                        uiState.copy(count = count)
                     }
                 }
             }
-        } // Separate coroutines??
+        }
         viewModelScope.launch {
             event.collect { event ->
                 handleEvent(event)
+            }
+        } // V2 with checking result
+        viewModelScope.launch{
+            counter.collect { counterResult ->
+                val counterUI =
+                    if (counterResult is Result.Success){
+                        AltUiState(count = counterResult.data, loading = false, error = "")
+
+                    } else if (counterResult is Result.Loading){
+                        AltUiState.Loading
+                    } else {
+                        AltUiState.Loading
+                    }
+                // Which way is better?
+                _uiState.update { altUiState ->
+                    altUiState.copy(count = counterUI.count, loading = counterUI.loading, error = counterUI.error)
+                }
+                    //_uiState.value = counterUI
             }
         }
     }
@@ -81,58 +83,33 @@ class CounterViewModel @Inject constructor(
         }
     }
 
-    // Any way to access the counter passed to the event? Extra code in Event classes?
+    // Best way to update count? use event value passed??
     fun handleEvent(event: CounterEvent) {
         when (event) {
             is CounterEvent.IncrementCount -> {
-                val newCount = state.value.counter.copy(count = state.value.counter.count + 1)
+                //val newCount = state.value.count + 1
+                val eventCount = event.newCount + 1
                 viewModelScope.launch(Dispatchers.IO) {
-                    countRepository.updateCount(newCount)
-                    Log.d("Counter", "Minus state=${state.value.counter.count}")
+                    countRepository.updateCount(eventCount)
+                    Log.d("Counter", "Minus state=${state.value.count}")
                 }
                 }
 
             is CounterEvent.DecrementCount -> {
-                val newCount = state.value.counter.copy(count = state.value.counter.count - 1)
+                val newCount = state.value.count - 1
                 viewModelScope.launch(Dispatchers.IO) {
                     countRepository.updateCount(newCount)
-                    Log.d("Counter", "Minus state=${state.value.counter.count}")
+                    Log.d("Counter", "Minus state=${state.value.count}")
                 }
             }
             is CounterEvent.ResetCount -> {
-                val newCount = state.value.counter.copy(count = 0)
+                val newCount = 0
                 viewModelScope.launch(Dispatchers.IO) {
                     countRepository.updateCount(newCount)
-                    Log.d("Counter", "Reset state=${state.value.counter}")
+                    Log.d("Counter", "Reset state=${state.value.count}")
                 }
             }
         }
     }
-
-
-//    fun incrementCount() {
-//        val newCount = state.value.counter.copy(count = state.value.counter.count + 1)
-//        Log.d("Counter", "New count: ${newCount.count}")
-//        viewModelScope.launch(Dispatchers.IO) {
-//            countRepository.updateCount(newCount)
-//            Log.d("Counter", "Add state=${state.value.counter.count}")
-//        }
-//    }
-//
-//    fun decrementCount() {
-//        val newCount = state.value.counter.copy(count = state.value.counter.count - 1)
-//        viewModelScope.launch(Dispatchers.IO) {
-//            countRepository.updateCount(newCount)
-//            Log.d("Counter", "Minus state=${state.value.counter.count}")
-//        }
-//    }
-//
-//    fun resetCount() {
-//        val newCount = state.value.counter.copy(count = 0)
-//        viewModelScope.launch(Dispatchers.IO) {
-//            countRepository.updateCount(newCount)
-//            Log.d("Counter", "Reset state=${state.value.counter}")
-//        }
-//    }
 
 }

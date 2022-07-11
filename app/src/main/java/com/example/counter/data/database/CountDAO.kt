@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 @Dao
 interface CountDAO {
-    @Query("SELECT * FROM count_table")
-    fun getCount() : Flow<Count>
+    @Query("SELECT count FROM count_table")
+    fun getCount() : Flow<Int>
 
     @Insert(onConflict = REPLACE)
     suspend fun updateCount(count: Count)

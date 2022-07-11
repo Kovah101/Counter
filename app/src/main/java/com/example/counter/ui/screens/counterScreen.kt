@@ -23,34 +23,29 @@ import com.example.counter.data.viewmodel.CounterViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.counter.data.database.Count
 import com.example.counter.ui.event.CounterEvent
+import com.example.counter.ui.state.AltUiState
 import com.example.counter.ui.state.UiState
 
 
 @Composable
 fun CounterScreen() {
     val viewModel = hiltViewModel<CounterViewModel>()
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.uiState.collectAsState()
 
 
     CounterScreenContent(
         state = state,
         eventHandler = viewModel::postEvent
-//        incrementCount = viewModel::incrementCount,
-//        decrementCount = viewModel::decrementCount,
-//        resetCount = viewModel::resetCount
     )
 }
 
 @Composable
 fun CounterScreenContent(
-    state: UiState,
+    state: AltUiState,
     eventHandler: (CounterEvent) -> Unit
-//    incrementCount: () -> Unit,
-//    decrementCount: () -> Unit,
-//    resetCount: () -> Unit
 ) {
     Log.d("Counter State", "$state")
-    val counter = state.counter
+    val counter = state.count
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,10 +62,17 @@ fun CounterScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CounterNumber(counter.count)
-            IncrementOrDecrement(eventHandler, counter)
-            Spacer(modifier = Modifier.height(20.dp))
-            CounterLabel()
+            when(state){
+                AltUiState.Loading -> LoadingWheel()
+                AltUiState.Error -> ErrorMessage(state.error)
+                else -> {
+                    CounterNumber(counter)
+                    IncrementOrDecrement(eventHandler, counter)
+                    Spacer(modifier = Modifier.height(20.dp))
+                    CounterLabel()
+                }
+            }
+
 
         }
     }
@@ -92,8 +94,7 @@ fun CounterNumber(count: Int) {
 @Composable
 fun IncrementOrDecrement(
     eventHandler: (CounterEvent) -> Unit,
-    counter : Count
-    //incrementCount: () -> Unit, decrementCount: () -> Unit
+    counter: Int
 ) {
     Row(
         horizontalArrangement = Arrangement.Center,
@@ -108,8 +109,7 @@ fun IncrementOrDecrement(
 @Composable
 fun IncreaseCount(
     eventHandler: (CounterEvent) -> Unit,
-    counter: Count
-    //incrementCount: () -> Unit
+    counter: Int
 ) {
     Button(
         onClick = { eventHandler(CounterEvent.IncrementCount(counter)) },
@@ -124,11 +124,10 @@ fun IncreaseCount(
 @Composable
 fun DecreaseCount(
     eventHandler: (CounterEvent) -> Unit,
-    counter: Count
-    //decrementCount: () -> Unit
+    counter: Int
 ) {
     Button(
-        onClick = {eventHandler(CounterEvent.DecrementCount(counter))},
+        onClick = { eventHandler(CounterEvent.DecrementCount(counter)) },
         colors = ButtonDefaults.buttonColors(
             backgroundColor = colorResource(id = R.color.teal_200)
         ),
@@ -156,5 +155,25 @@ fun FloatingResetButton(resetCount: () -> Unit) {
         onClick = resetCount,
         elevation = FloatingActionButtonDefaults.elevation(8.dp),
         backgroundColor = colorResource(id = R.color.teal_200)
+    )
+}
+
+@Composable
+fun LoadingWheel(){
+    CircularProgressIndicator(
+        color = colorResource(id = R.color.teal_700),
+        modifier = Modifier.width(150.dp).height(150.dp),
+        strokeWidth = 8.dp
+    )
+}
+
+@Composable
+fun ErrorMessage(error : String){
+    Text(
+        text = error,
+        fontStyle = FontStyle.Italic,
+        color = colorResource(id = R.color.teal_700),
+        fontSize = 100.sp,
+        fontWeight = FontWeight.Bold,
     )
 }

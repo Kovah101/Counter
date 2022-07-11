@@ -12,9 +12,9 @@ class CountRepository @Inject constructor(
     private val countDAO: CountDAO
 ) {
 
-    fun getCount(): Flow<Count> = countDAO.getCount()
+    fun getCount(): Flow<Int> = countDAO.getCount()
 
-    suspend fun updateCount(newCount : Count) = countDAO.updateCount(newCount)
+    suspend fun updateCount(newCount: Int) = countDAO.updateCount(Count(1, newCount))
 
     suspend fun insertCount() = countDAO.startNewCount()
 

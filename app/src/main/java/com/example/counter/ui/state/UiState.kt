@@ -4,11 +4,11 @@ import android.support.v4.os.IResultReceiver
 import com.example.counter.data.database.Count
 
 data class UiState(
-    val counter: Count
+    val count: Int
 
 ) {
     companion object{
-        val Default = UiState(Count(1,0))
+        val Default = UiState(0)
     }
 
 }
