@@ -14,3 +14,7 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Counter"
 include ':app'
+include ':data'
+include ':database'
+include ':core-ui'
+include ':core'
