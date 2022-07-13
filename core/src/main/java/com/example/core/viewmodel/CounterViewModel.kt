@@ -20,7 +20,8 @@ class CounterViewModel @Inject constructor(
     private val countRepository: CountRepository
 ) : ViewModel() {
 
-    private val _events: MutableSharedFlow<com.example.core.event.CounterEvent> = MutableSharedFlow()
+    private val _events: MutableSharedFlow<com.example.core.event.CounterEvent> =
+        MutableSharedFlow()
     private val event = _events.asSharedFlow()
 
     // V2 - Using Result
@@ -88,7 +89,7 @@ class CounterViewModel @Inject constructor(
     fun handleEvent(event: com.example.core.event.CounterEvent) {
         when (event) {
             is com.example.core.event.CounterEvent.IncrementCount -> {
-                //val newCount = state.value.count + 1
+                //val newCount = uiState.value.count + 1
                 val eventCount = event.newCount + 1
                 viewModelScope.launch(Dispatchers.IO) {
                     countRepository.updateCount(eventCount)
@@ -97,7 +98,8 @@ class CounterViewModel @Inject constructor(
             }
 
             is com.example.core.event.CounterEvent.DecrementCount -> {
-                val newCount = state.value.count - 1
+                //val newCount = uiState.value.count-1
+                val newCount = event.newCount - 1
                 viewModelScope.launch(Dispatchers.IO) {
                     countRepository.updateCount(newCount)
                     Log.d("Counter", "Minus state=${state.value.count}")

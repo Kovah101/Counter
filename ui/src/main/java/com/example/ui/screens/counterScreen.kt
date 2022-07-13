@@ -1,4 +1,4 @@
-package com.example.core_ui.screens
+package com.example.ui.screens
 
 
 import android.util.Log
@@ -21,7 +21,7 @@ import com.example.core.viewmodel.CounterViewModel
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.core.event.CounterEvent
 import com.example.core.state.AltUiState
-import com.example.core_ui.R
+import com.example.ui.R
 
 
 @Composable
