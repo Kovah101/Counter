@@ -13,8 +13,7 @@ interface CountDAO {
     @Insert(onConflict = REPLACE)
     suspend fun updateCount(count: Count)
 
-//    @Insert
-//    suspend fun startNewCount()
+
     @Query("INSERT INTO count_table DEFAULT VALUES")
     suspend fun startNewCount()
 
